@@ -1,114 +1,54 @@
-# 第三课作业
+# 书生·普语大模型实战营第二期——用茴香豆搭建个人的RAG知识助手
 
-## 基础作业
+## 一、RAG的基础知识
 
-### 1. 在[茴香豆 Web 版](https://openxlab.org.cn/apps/detail/tpoisonooo/huixiangdou-web)中创建自己领域的知识问答助手
+### 1. 什么是RAG
 
-> - 参考视频[零编程玩转大模型，学习茴香豆部署群聊助手](https://www.bilibili.com/video/BV1S2421N7mn)
-> - 完成不少于 400 字的笔记 + 线上茴香豆助手对话截图(不少于5轮)
-> - （可选）参考 [代码](https://github.com/InternLM/HuixiangDou/tree/main/web) 在自己的服务器部署茴香豆 Web 版
+​	RAG（Retrieval Augmented Generation）技术，通过检索与用户输入相关的信息片段，并结合***外部知识库***来生成更准确、更丰富的回答。解决 LLMs 在处理知识密集型任务时可能遇到的挑战, 如幻觉、知识过时和缺乏透明、可追溯的推理过程等。提供更准确的回答、降低推理成本、实现外部记忆。
 
-<img src="./assets/image-20240409120137854.png" alt="image-20240409120137854" style="zoom: 67%;" />
+![image-20240408094755689](./assets/image-20240408094755689.png)
 
-<img src="./assets/image-20240409120156568.png" alt="image-20240409120156568" style="zoom:67%;" />
+**特点**：可以解决大型模型在处理知识密集型任务时面临的各种挑战，如生成幻觉等问题；可以让大型模型具备外部记忆功能，在不需要额外训练的情况下就能获取新知识，降低了整体的成本。
 
-<img src="./assets/image-20240409120214038.png" alt="image-20240409120214038" style="zoom:67%;" />
+![image-20240408095500160](./assets/image-20240408095500160.png)
 
-<img src="./assets/image-20240409121342785.png" alt="image-20240409121342785" style="zoom:67%;" />
+**应用**：问答系统、文本生成系统、信息检索，以及在结合了多模态大模型之后，RAG技术也能够用于图片的描述等。
 
-<img src="./assets/image-20240409124127093.png" alt="image-20240409124127093" style="zoom:67%;" />
+![image-20240408095527430](./assets/image-20240408095527430.png)
 
-<img src="./assets/image-20240409124335804.png" alt="image-20240409124335804" style="zoom:67%;" />
+### 2. RAG的工作原理
 
-<img src="./assets/image-20240409124400371.png" alt="image-20240409124400371" style="zoom:67%;" />
+- 经典的RNG由三个部分组成：**索引(indexing)、检索(retrieval)、生成(generation)**
+- **索引**部分负责处理外部知识，将知识源（如文档、网页）分割成trunk，然后编码成向量，并存储在专用的向量数据库中
+- **检索**部分负责接收用户的问题，然后将问题也编码成向量，在向量数据库中找出与问题最相关的内容
+- **生成**部分负责将检索到的内容和原始问题一起作为提示，输入到大模型中，生成最终的答案
 
-<img src="./assets/image-20240409124534297.png" alt="image-20240409124534297" style="zoom:67%;" />
-
-<img src="./assets/image-20240409124548269.png" alt="image-20240409124548269" style="zoom:67%;" />
-
-<img src="./assets/image-20240409124655996.png" alt="image-20240409124655996" style="zoom:67%;" />
-
-<img src="./assets/image-20240409124802074.png" alt="image-20240409124802074" style="zoom:67%;" />
-
-Done.
+![image-20240408095743502](./assets/image-20240408095743502.png)
 
 
 
-### 2. 在 `InternLM Studio` 上部署茴香豆技术助手
-
-> - 根据教程文档搭建 `茴香豆技术助手`，针对问题"茴香豆怎么部署到微信群？"进行提问
-> - 完成不少于 400 字的笔记 + 截图
-
-![image-20240409124934446](./assets/image-20240409124934446.png)
-
-![image-20240409124943102](./assets/image-20240409124943102.png)
-
-![image-20240409124952485](./assets/image-20240409124952485.png)
-
-![image-20240409125000381](./assets/image-20240409125000381.png)
-
-![image-20240409125020888](./assets/image-20240409125020888.png)
-
-![image-20240409125028149](./assets/image-20240409125028149.png)
-
-![image-20240409125043859](./assets/image-20240409125043859.png)
-
-![image-20240409125053571](./assets/image-20240409125053571.png)
-
-Done.
 
 
 
-## 进阶作业
 
-### A.【应用方向】 结合自己擅长的领域知识（游戏、法律、电子等）、专业背景，搭建个人工作助手或者垂直领域问答助手，参考茴香豆官方文档，部署到下列任一平台。
 
-> - 飞书、微信
-> - 可以使用 茴香豆 Web 版 或 InternLM Studio 云端服务器部署
-> - 涵盖部署全过程的作业报告和个人助手问答截图
 
-#### 1. 使用茴香豆 Web 版新建知识库
 
-<img src="./assets/image-20240409125940750.png" alt="image-20240409125940750" style="zoom: 67%;" />
 
-#### 2. 上传相关知识库文档
 
-<img src="./assets/image-20240409130036458.png" alt="image-20240409130036458" style="zoom:67%;" />
 
-#### 3. 验证知识库内容
 
-<img src="./assets/image-20240409131442130.png" alt="image-20240409131442130" style="zoom:67%;" />
 
-#### 4. 飞书bot与茴香豆web版对接
 
-将加密策略填入bot对应配置
 
-参考配置教程：https://aicarrier.feishu.cn/docx/H1AddcFCioR1DaxJklWcLxTDnEc
+## 二、茴香豆
 
-<img src="./assets/image-20240409132028792.png" alt="image-20240409132028792" style="zoom:67%;" />
 
-<img src="./assets/image-20240409132232678.png" alt="image-20240409132232678" style="zoom:67%;" />
 
-<img src="./assets/image-20240409132402750.png" alt="image-20240409132402750" style="zoom:67%;" />
 
-<img src="./assets/image-20240409131747138.png" alt="image-20240409131747138" style="zoom:67%;" />
 
-将bot相关参数填入茴香豆web版配置处
 
-<img src="./assets/image-20240409131627677.png" alt="image-20240409131627677" style="zoom:67%;" />
 
-#### 5. 发布bot并添加进对应群聊
 
-![image-20240409132631472](./assets/image-20240409132631472.png)
 
-#### 6. 为群聊名称添加对应后缀
-
-![image-20240409132805046](./assets/image-20240409132805046.png)
-
-#### 7. 在群聊中提出问题，bot自动回答
-
-<img src="./assets/image-20240409133001170.png" alt="image-20240409133001170" style="zoom:67%;" />
-
-<img src="./assets/image-20240409133058730.png" alt="image-20240409133058730" style="zoom:67%;" />
-
-Done.
+## 三、实践
