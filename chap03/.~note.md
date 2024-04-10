@@ -1,3 +1,7 @@
+[TOC]
+
+------
+
 # 书生·普语大模型实战营第二期——用茴香豆搭建个人的RAG知识助手
 
 ## 一、RAG的基础知识
@@ -130,11 +134,11 @@
 
 ​	茴香豆（豆哥）是一款基于Retrieval Augmented Generation（RAG）技术的知识助手应用。RAG技术通过检索与用户输入相关的信息片段，并结合外部知识库来生成更准确、更丰富的回答，它能够帮助用户快速获取知识，且无需训练就可以掌握新领域的知识，从而解决大型语言模型在处理知识密集型任务时可能遇到的挑战。
 
-### 1. **应用特点**
+### 1. 应用特点
 
 ​	茴香豆应用能够通过RAG技术，让基础模型实现非参数知识更新，无需训练就可以掌握新领域的知识。此外，茴香豆还支持从本地向量数据库中检索内容进行回答，也可以加入网络的搜索结果，生成回答。
 
-### 2. **应用场景**
+### 2. 应用场景
 
 ​	茴香豆可以应用于各种需要知识问答的场景，如客服机器人、智能家居等。通过茴香豆，用户可以快速、高效地获取到他们所需要的知识。
 
@@ -178,7 +182,7 @@
 
 ## 三、实践
 
-### 一、茴香豆web版
+### （一）、茴香豆web版
 
 #### 1. 登录茴香豆web版页面
 
@@ -234,4 +238,357 @@ https://openxlab.org.cn/apps/detail/tpoisonooo/huixiangdou-web
 
 > 所以，“提问的智慧”不光是在与人交流中，与大模型交流也一样需要。
 
-#### 6. 调用端口部署到自己的飞书群
+#### 6. 调用端口部署到飞书群
+
+- 创建bot应用
+
+<img src="./assets/image-20240410160848902.png" alt="image-20240410160848902" style="zoom:67%;" />
+
+- 将应用凭证信息填入茴香豆web版
+
+  <img src="./assets/image-20240410161005552.png" alt="image-20240410161005552" style="zoom:67%;" />
+
+  <img src="./assets/image-20240409131627677.png" alt="image-20240409131627677" style="zoom:67%;" />
+
+- bot配置页面填入加密策略
+
+<img src="./assets/image-20240409131747138.png" alt="image-20240409131747138" style="zoom:67%;" />
+
+- 填入时间回调地址
+
+<img src="./assets/image-20240409132028792.png" alt="image-20240409132028792" style="zoom:67%;" />
+
+- 添加【接收消息】事件
+
+<img src="./assets/image-20240409132232678.png" alt="image-20240409132232678" style="zoom:67%;" />
+
+- 开通权限：im:chat:readonly 和 im:message:send_as_bot
+
+<img src="./assets/image-20240409132402750.png" alt="image-20240409132402750" style="zoom:67%;" />
+
+- 发布bot应用，并添加进群聊
+
+![image-20240409132631472](./assets/image-20240409132631472.png)
+
+- 给飞书群名加上后缀
+
+![image-20240409132805046](./assets/image-20240409132805046.png)
+
+开始对话
+
+<img src="./assets/image-20240409133001170.png" alt="image-20240409133001170" style="zoom:67%;" />
+
+<img src="./assets/image-20240409133058730.png" alt="image-20240409133058730" style="zoom:67%;" />
+
+Done.
+
+------
+
+### （二）、在 `InternLM Studio` 上部署茴香豆
+
+#### 1. 环境准备
+
+**进入开发机，创建并激活基础环境**
+
+```bash
+# 从官方环境复制运行 InternLM 的基础环境
+studio-conda -o internlm-base -t InternLM2_Huixiangdou
+
+# 在本地查看环境列表
+conda env list
+
+# 激活 InternLM2_Huixiangdou python 虚拟环境
+conda activate InternLM2_Huixiangdou
+```
+
+![image-20240409124934446](./assets/image-20240409124934446.png)
+
+#### 2. 下载基础文件
+
+**复制茴香豆所需模型文件**
+
+```bash
+# 复制BCE模型
+ln -s /root/share/new_models/maidalun1020/bce-embedding-base_v1 /root/models/bce-embedding-base_v1
+ln -s /root/share/new_models/maidalun1020/bce-reranker-base_v1 /root/models/bce-reranker-base_v1
+
+# 复制大模型参数
+ln -s /root/share/new_models/Shanghai_AI_Laboratory/internlm2-chat-7b /root/models/internlm2-chat-7b
+```
+
+![image-20240409124943102](./assets/image-20240409124943102.png)
+
+#### 3. 下载安装茴香豆
+
+**安装依赖**
+
+```bash
+# 新建requirements.txt
+cd /root
+echo "
+	protobuf==4.25.3
+	accelerate==0.28.0 
+	aiohttp==3.9.3 
+	auto-gptq==0.7.1 
+	bcembedding==0.1.3 
+	beautifulsoup4==4.8.2 
+	einops==0.7.0 
+	faiss-gpu==1.7.2 
+	langchain==0.1.14 
+	loguru==0.7.2 
+	lxml_html_clean==0.1.0
+    openai==1.16.1 
+    openpyxl==3.1.2
+    pandas==2.2.1 
+    pydantic==2.6.4
+    pymupdf==1.24.1 
+    python-docx==1.1.0
+    pytoml==0.1.21
+    readability-lxml==0.8.1 
+    redis==5.0.3 
+    requests==2.31.0 
+    scikit-learn==1.4.1.post1 
+    sentence_transformers==2.2.2 
+    textract==1.6.5 tiktoken==0.6.0 
+    transformers==4.39.3 
+    transformers_stream_generator==0.0.5 
+    unstructured==0.11.2
+" > requirements.txt
+
+# 安装python依赖 (不含Word文件解析)
+ pip install -r requirements.txt
+```
+
+<img src="./assets/image-20240408123432161.png" alt="image-20240408123432161" style="zoom:67%;" />
+
+**下载茴香豆并对齐版本**
+
+```bash
+cd /root
+# 下载茴香豆repo
+git clone https://github.com/internlm/huixiangdou && cd huixiangdou
+git checkout 447c6f7e68a1657fce1c4f7c740ea1700bde0440
+```
+
+![image-20240409124952485](./assets/image-20240409124952485.png)
+
+#### 4. 修改配置文件 
+
+> `/root/huixiangdou/config.ini` 
+
+```ini
+# 修改用于向量数据库和词嵌入的模型
+- embedding_model_path = "maidalun1020/bce-embedding-base_v1"
++ embedding_model_path = "/root/models/bce-embedding-base_v1" 
+
+# 修改用于检索的重排序模型
+- reranker_model_path = "maidalun1020/bce-reranker-base_v1"
++ reranker_model_path = "/root/models/bce-reranker-base_v1"
+
+# 修改选用的大模型
+- local_llm_path = "internlm/internlm2-chat-7b"
++ local_llm_path = "/root/models/internlm2-chat-7b"
+```
+
+![image-20240409125000381](./assets/image-20240409125000381.png)
+
+#### 5. 创建知识库
+
+> 使用 **InternLM** 的 **Huixiangdou** 文档作为新增知识数据检索来源
+
+```bash
+cd /root/huixiangdou && mkdir repodir
+# 下载 Huixiangdou 语料
+git clone https://github.com/internlm/huixiangdou --depth=1 repodir/huixiangdou
+```
+
+> 除了语料知识的向量数据库，茴香豆建立接受和拒答两个向量数据库，用来在检索的过程中更加精确的判断提问的相关性，这两个数据库的来源分别是：
+>
+> - 接受问题列表，希望茴香豆助手回答的示例问题
+>   - 存储在 `/root/huixiangdou/resource/good_questions.json` 中
+> - 拒绝问题列表，希望茴香豆助手拒答的示例问题
+>   - 存储在 `/root/huixiangdou/resource/bad_questions.json` 中
+>   - 其中多为技术无关的主题或闲聊
+>   - 如："nihui 是谁", "具体在哪些位置进行修改？", "你是谁？", "1+1"
+
+```bash
+# 增加茴香豆相关的问题到接受问题示例中
+cd /root/huixiangdou
+mv resource/good_questions.json resource/good_questions_bk.json
+echo '[
+    "mmpose中怎么调用mmyolo接口",
+    "mmpose实现姿态估计后怎么实现行为识别",
+    "mmpose执行提取关键点命令不是分为两步吗，一步是目标检测，另一步是关键点提取，我现在目标检测这部分的代码是demo/topdown_demo_with_mmdet.py demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth   现在我想把这个mmdet的checkpoints换位yolo的，那么应该怎么操作",
+    "在mmdetection中，如何同时加载两个数据集，两个dataloader",
+    "如何将mmdetection2.28.2的retinanet配置文件改为单尺度的呢？",
+    "1.MMPose_Tutorial.ipynb、inferencer_demo.py、image_demo.py、bottomup_demo.py、body3d_pose_lifter_demo.py这几个文件和topdown_demo_with_mmdet.py的区别是什么，\n2.我如果要使用mmdet是不是就只能使用topdown_demo_with_mmdet.py文件，",
+    "mmpose 测试 map 一直是 0 怎么办？",
+    "如何使用mmpose检测人体关键点？",
+    "我使用的数据集是labelme标注的，我想知道mmpose的数据集都是什么样式的，全都是单目标的数据集标注，还是里边也有多目标然后进行标注",
+    "如何生成openmmpose的c++推理脚本",
+    "mmpose",
+    "mmpose的目标检测阶段调用的模型，一定要是demo文件夹下的文件吗，有没有其他路径下的文件",
+    "mmpose可以实现行为识别吗，如果要实现的话应该怎么做",
+    "我在mmyolo的v0.6.0 (15/8/2023)更新日志里看到了他新增了支持基于 MMPose 的 YOLOX-Pose，我现在是不是只需要在mmpose/project/yolox-Pose内做出一些设置就可以，换掉demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py 改用mmyolo来进行目标检测了",
+    "mac m1从源码安装的mmpose是x86_64的",
+    "想请教一下mmpose有没有提供可以读取外接摄像头，做3d姿态并达到实时的项目呀？",
+    "huixiangdou 是什么？",
+    "使用科研仪器需要注意什么？",
+    "huixiangdou 是什么？",
+    "茴香豆 是什么？",
+    "茴香豆 能部署到微信吗？",
+    "茴香豆 怎么应用到飞书",
+    "茴香豆 能部署到微信群吗？",
+    "茴香豆 怎么应用到飞书群",
+    "huixiangdou 能部署到微信吗？",
+    "huixiangdou 怎么应用到飞书",
+    "huixiangdou 能部署到微信群吗？",
+    "huixiangdou 怎么应用到飞书群",
+    "huixiangdou",
+    "茴香豆",
+    "茴香豆 有哪些应用场景",
+    "huixiangdou 有什么用",
+    "huixiangdou 的优势有哪些？",
+    "茴香豆 已经应用的场景",
+    "huixiangdou 已经应用的场景",
+    "huixiangdou 怎么安装",
+    "茴香豆 怎么安装",
+    "茴香豆 最新版本是什么",
+    "茴香豆 支持哪些大模型",
+    "茴香豆 支持哪些通讯软件",
+    "config.ini 文件怎么配置",
+    "remote_llm_model 可以填哪些模型?"
+]' > /root/huixiangdou/resource/good_questions.json
+```
+
+```bash
+# 创建一个测试用的问询列表
+cd /root/huixiangdou
+echo '[
+"huixiangdou 是什么？",
+"你好，介绍下自己"
+]' > ./test_queries.json
+```
+
+#### 6. 创建向量数据库
+
+```bash
+# 创建向量数据库存储目录
+cd /root/huixiangdou && mkdir workdir 
+
+# 分别向量化知识语料、接受问题和拒绝问题中后保存到 /root/huixiangdou/workdir
+python3 -m huixiangdou.service.feature_store --sample ./test_queries.json
+```
+
+![image-20240410200339080](./assets/image-20240410200339080.png)
+
+![image-20240409125020888](./assets/image-20240409125020888.png)
+
+![image-20240408132452501](./assets/image-20240408132452501.png)
+
+#### 7. 运行茴香豆
+
+```bash
+# 填入问题
+sed -i '74s/.*/queries = ["huixiangdou 是什么？", "茴香豆怎么部署到微信群", "今天天气怎么样？"]/' /root/huixiangdou/huixiangdou/main.py
+```
+
+![image-20240408133012322](./assets/image-20240408133012322.png)
+
+```bash
+# 运行茴香豆
+cd /root/huixiangdou/
+python3 -m huixiangdou.main --standalone
+```
+
+![image-20240408134013684](./assets/image-20240408134013684.png)
+
+![image-20240408134115474](./assets/image-20240408134115474.png)
+
+![image-20240408134317369](./assets/image-20240408134317369.png)
+
+Done.
+
+------
+
+### （三）、进阶
+
+#### 1. 加入网络搜索
+
+> 登录 [Serper](https://serper.dev/) ，获取API-key
+
+<img src="./assets/image-20240408141832048.png" alt="image-20240408141832048" style="zoom:67%;" />
+
+> 修改 `/root/huixiangdou/config.ini`
+
+```ini
+[web_search]
+# check https://serper.dev/api-key to get a free API key
+- x_api_key = "${YOUR-API-KEY}"
++ x_api_key = "1848********************"
+```
+
+![image-20240408141927912](./assets/image-20240408141927912.png)
+
+#### 2. 使用远程大模型
+
+> 修改 `/root/huixiangdou/config.ini`
+
+```ini
+enable_local = 0 # 关闭本地模型
+enable_remote = 1 # 启用云端模型
+```
+
+> 修改 `remote_` 相关配置，填写 API key、模型类型等参数
+
+![image-20240410202613402](./assets/image-20240410202613402.png)
+
+> 修改 `huixiangdou/huixiangdou/service/llm_server_hybrid.py`
+>
+> 将ChatGPT的base_url强行指向`https://api.nextapi.fun/v1`接口
+
+![image-20240410203156096](./assets/image-20240410203156096.png)
+
+> 这里启用的远程模型，只用在问答分析和问题生成，依然需要本地嵌入、重排序模型进行特征提取。
+>
+> 运行效果👇
+
+![image-20240408223447147](./assets/image-20240408223447147.png)
+
+![image-20240408223633180](./assets/image-20240408223633180.png)
+
+![image-20240408223726088](./assets/image-20240408223726088.png)
+
+![image-20240408223827681](./assets/image-20240408223827681.png)
+
+#### 3. 利用 Gradio 搭建网页 Demo
+
+> 安装 **Gradio** 依赖
+
+```bash
+pip install gradio==4.25.0 redis==5.0.3 flask==3.0.2 lark_oapi==1.2.4
+```
+
+> 启动茴香豆对话 Demo 服务
+
+```bash
+cd /root/huixiangdou
+python3 -m tests.test_query_gradio 
+```
+
+> 配置本地power shell端口映射
+
+```powershell
+ssh -p 41686 root@ssh.intern-ai.org.cn -CNg -L 7860:127.0.0.1:7860 -o StrictHostKeyChecking=no
+```
+
+![image-20240408161727009](./assets/image-20240408161727009.png)
+
+> 本地浏览器访问http://127.0.0.1:7860 进入Gradio对话页面
+
+![image-20240408225012855](./assets/image-20240408225012855.png)
+
+![image-20240408230243304](./assets/image-20240408230243304.png)
+
+Done.
+
